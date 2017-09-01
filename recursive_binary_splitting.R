@@ -17,7 +17,7 @@ split_data <- function(X, var, val) {
   #   val, the value in which the data will be separate
   # Return a list of two elements. The first one is the portion given by
   # the left region of the cut point value ("val"), and the second, is 
-  # the right region of the cut point valueEl primero es la porción
+  # the right region of the cut point value
   # (FOR NOW THIS IMPLEMENTATION ONLY WORK WITH CONTINUOS VARIABLES
   # AS RESPONSE AND PREDICTORS)
   subset_vector <- X[[var]] < val
