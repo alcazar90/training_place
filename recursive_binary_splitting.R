@@ -42,6 +42,7 @@ cut_points <- function(x) {
   s
 }
 
+
 optimal_point <- function(y, x, s) {
   # Input: y, response variable
   #   x, the predictor variable to split
@@ -84,10 +85,74 @@ select_var <- function(y, X) {
   list(var = names(X)[which.min(metric)], split_point = cp_star[which.min(metric)])
 }
 
-t <- select_var(y, df[, c(2, 3)])
-split_data(df, t$var, t$split_point)
+
+stack_list <- function(x) {
+  #
+  #
+  #
+  
+}
 
 
+# create a simple list
+stack_list <- list(var1 = "a", var2 = "b", var3 = "c")
+n <- length(stack_list)
+stack_list[n] <- NULL
+stack_list
+
+dequeue <- function(x) {
+  last_index <- length(x)
+  output <- x[last_index]
+  output[last_index] <- NULL
+  output
+}
+
+stack_list
+dequeue(stack_list)
+stack_list
+
+
+# Implementación recursiva 
+# ==========================================================================
+# 1. seleccionar variable
+
+# 2. splitear data en base al punto optimo de la variable seleccionada
+
+# 3. repetir proceso anterior
+
+# 4. en una de las regiones recien spliteadas (fijar una convención sí
+# se splitea siempre la región izquierda o derecha) utilizar una estructura
+# de datos para ir apilando las regiones a splitear
+
+# 5.Crear un criterio de stop
+
+recursive_binary_splitting(y, X, var = NULL) {
+  # create data structure
+  if (var == NULL) {
+    selected_info <- select_var(y, X)
+    var_to_split <- selected_info$var
+    opt_point <- selected_info$split_point
+  } else {
+    
+  }
+  temp <- select_(y, X)
+  var_to_split <- temp$var
+  point_to_split <- temp$split_point
+  if (criterio) {
+    # 
+  } else {
+    # dsasda
+  }
+}
+
+
+recur_binary_splitting(y, X) {
+  if (criterio) {
+    
+  } else {
+    data_to_split <-
+  }
+}
 
 
 # usage
