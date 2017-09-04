@@ -114,6 +114,19 @@ freq <- function(x) {
   output
 }
 
+# verify the gini index calculation in this link:
+# https://stats.stackexchange.com/questions/77213/computing-the-gini-index
+gini_index <- function(x) {
+  # Input: x, a vector containing the frequency for the levels of
+  #         a categorical variable
+  # Return the gini index for the given categorical variable
+  output <- vector("double", length(x))
+  for (i in length(output)) {
+    p <- x[i]
+    output[i] <- p ^ 2
+  }
+  1 - sum(output)
+}
 
 entropy <- function(x) {
   # Input: x, a vector containing the frequency for the levels of
@@ -127,8 +140,9 @@ entropy <- function(x) {
   sum(output)
 }
 
-# compute the entropy criteria at the root node (all data)
+# compute the entropy and the gini index criteria at the root node (all data)
 entropy(freq(toy$hire))
+gini_index(freq(toy$hire))
 
 # compute the entropy citeria after resolve the root note; suppose that
 # the variable selected as root node was "hire", and now we are compute
@@ -136,8 +150,7 @@ entropy(freq(toy$hire))
 df <- toy[, c("high_degree", "hire")]
 by_level <- split(df, df$high_degree)
 lapply(by_level, function(df) entropy(freq(df$hire)))
-
-
+lapply(by_level, function(df) gini_index(freq(df$hire)))
 
 
 # Recursive binary splitting/partition
