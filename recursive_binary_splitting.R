@@ -1,7 +1,6 @@
-library(ggplot2)
 library(ISLR)
 
-# prepare data example
+# prepare data example for continuos variables
 df <- ISLR::Hitters[, c("Salary", "Years", "Hits")]
 row.names(df) <- NULL
 df$Salary <- log(df$Salary)
@@ -86,7 +85,7 @@ select_var <- function(y, X) {
 }
 
 
-
+# toy example to test the categorical criterias
 toy <- data.frame(high_degree = c("Bachelors", "Masters", "Masters", "PhD", "PhD",
                                   "Bachelors", "Bachelors", "PhD", "Bachelors",
                                   "Masters", "Masters", "PhD", "Masters", "Bachelors"),
@@ -128,23 +127,35 @@ entropy <- function(x) {
   sum(output)
 }
 
+# compute the entropy criteria at the root node (all data)
+entropy(freq(toy$hire))
+
+# compute the entropy citeria after resolve the root note; suppose that
+# the variable selected as root node was "hire", and now we are compute
+# the criteria for the variable "high_degree"
 df <- toy[, c("high_degree", "hire")]
 by_level <- split(df, df$high_degree)
 lapply(by_level, function(df) entropy(freq(df$hire)))
 
-# Implementación recursiva 
+
+
+
+# Recursive binary splitting/partition
 # ==========================================================================
-# 1. seleccionar variable
+# 1. Select the variable:
+#  which minimize in the most quantity in the
+# case of continuos variables the RSS or gain the maximum information
+# in the case of categorical variables
 
-# 2. splitear data en base al punto optimo de la variable seleccionada
+# 2. Split the data:
+# based in cut point of the selected variable in case of continuos variables
+# or in the category that...
 
-# 3. repetir proceso anterior
+# 3. Repeat the previous process (step 1 + 2) on the new created region
+# left or right but be consistent
 
-# 4. en una de las regiones recien spliteadas (fijar una convención sí
-# se splitea siempre la región izquierda o derecha) utilizar una estructura
-# de datos para ir apilando las regiones a splitear
-
-# 5.Crear un criterio de stop
+# 4. Create a stop criteria based on the number of observations
+# that contain the regions
 
 recursive_binary_splitting(y, X, var = NULL) {
   # create data structure
@@ -164,21 +175,5 @@ recursive_binary_splitting(y, X, var = NULL) {
     # dsasda
   }
 }
-
-
-recur_binary_splitting(y, X) {
-  if (criterio) {
-    
-  } else {
-    data_to_split <-
-  }
-}
-
-
-
-
-
-
-
 
 
