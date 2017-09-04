@@ -86,31 +86,51 @@ select_var <- function(y, X) {
 }
 
 
-stack_list <- function(x) {
-  #
-  #
-  #
-  
-}
 
+toy <- data.frame(high_degree = c("Bachelors", "Masters", "Masters", "PhD", "PhD",
+                                  "Bachelors", "Bachelors", "PhD", "Bachelors",
+                                  "Masters", "Masters", "PhD", "Masters", "Bachelors"),
+                  work_exp = c("Mobile Dev", "Web Dev", "Mobile Dev", "Mobile Dev",
+                               "Web Dev", "UX Design", "Mobile Dev", "Web Dev",
+                               rep("UX Design", 3), "Mobile Dev", "Mobile Dev",
+                               "Web Dev"),
+                  fav_language = c("Objective-C", "Java", "Java", rep("Objective-C", 3),
+                                   "Java", "Objective-C", "Java", "Objective-C",
+                                   rep("Java", 3), "Objective-C"),
+                  work_visa = c("TRUE", "FALSE", rep("TRUE", 4), rep("FALSE", 3), "TRUE",
+                                "FALSE", "FALSE", "TRUE", "TRUE"),
+                  hire = c(rep("yes", 4), "no", "no", "yes", "no", "yes", "no", "yes",
+                           "no", "yes", "no"))
+                  
 
-# create a simple list
-stack_list <- list(var1 = "a", var2 = "b", var3 = "c")
-n <- length(stack_list)
-stack_list[n] <- NULL
-stack_list
-
-dequeue <- function(x) {
-  last_index <- length(x)
-  output <- x[last_index]
-  output[last_index] <- NULL
+freq <- function(x) {
+  # Input: x, a factor (categorical) vector
+  # Return the frequency for each level
+  labels <- unique(x)
+  output <- vector("double", length(labels))
+  for (i in 1:length(output)) {
+    output[i] <- sum(x == labels[i]) / length(x)
+    names(output)[i] <- levels(labels)[i]
+  }
   output
 }
 
-stack_list
-dequeue(stack_list)
-stack_list
 
+entropy <- function(x) {
+  # Input: x, a vector containing the frequency for the levels of
+  #         a categorical variable
+  # Return the entropy for the given categorical variable
+  output <- vector("double", length(x))
+  for (i in length(output)) {
+   p <- x[i] 
+   output[i] <- -p * log2(p)  
+  }
+  sum(output)
+}
+
+df <- toy[, c("high_degree", "hire")]
+by_level <- split(df, df$high_degree)
+lapply(by_level, function(df) entropy(freq(df$hire)))
 
 # Implementación recursiva 
 # ==========================================================================
@@ -155,14 +175,7 @@ recur_binary_splitting(y, X) {
 }
 
 
-# usage
-output <- find_split(y, x, cut_points(x))
 
-p <- data.frame(x = as.double(names(output)), y = output,
-                stringsAsFactors = FALSE)
-
-ggplot(p, aes(x = x, y = y)) + geom_line()
-output[which.min(output)]
 
 
 
