@@ -105,11 +105,11 @@ toy <- data.frame(high_degree = c("Bachelors", "Masters", "Masters", "PhD", "PhD
 freq <- function(x) {
   # Input: x, a factor (categorical) vector
   # Return the frequency for each level
-  labels <- unique(x)
+  labels <- levels(x)
   output <- vector("double", length(labels))
   for (i in 1:length(output)) {
     output[i] <- sum(x == labels[i]) / length(x)
-    names(output)[i] <- levels(labels)[i]
+    names(output)[i] <- labels[i]
   }
   output
 }
@@ -121,7 +121,7 @@ gini_index <- function(x) {
   #         a categorical variable
   # Return the gini index for the given categorical variable
   output <- vector("double", length(x))
-  for (i in length(output)) {
+  for (i in 1:length(output)) {
     p <- x[i]
     output[i] <- p ^ 2
   }
@@ -133,7 +133,7 @@ entropy <- function(x) {
   #         a categorical variable
   # Return the entropy for the given categorical variable
   output <- vector("double", length(x))
-  for (i in length(output)) {
+  for (i in 1:length(output)) {
    p <- x[i] 
    output[i] <- -p * log2(p)  
   }
@@ -149,8 +149,12 @@ gini_index(freq(toy$hire))
 # the criteria for the variable "high_degree"
 df <- toy[, c("high_degree", "hire")]
 by_level <- split(df, df$high_degree)
+by_level
+lapply(by_level, function(df) freq(df$hire))
 lapply(by_level, function(df) entropy(freq(df$hire)))
 lapply(by_level, function(df) gini_index(freq(df$hire)))
+
+
 
 
 # Recursive binary splitting/partition
@@ -188,5 +192,38 @@ recursive_binary_splitting(y, X, var = NULL) {
     # dsasda
   }
 }
+
+
+
+
+
+# ==============================================================================
+#                     Entropy and Gini Index Plot
+# ==============================================================================
+# función de entropia (Claude Shannon / Teoría de la información) 
+entropy <- function(p) {
+  -p * log2(p) + ( - (1- p) * log2((1 - p)))
+}
+
+gini <- function(p) {
+ 1 - p^2 - (1 - p) ^2
+}
+
+# crear un vector con una secuencia de proporciones, i.e., 0, 0.01, etc
+p <- seq(0, 1, by = .01)
+
+# crear data frame con input - output
+df <- data.frame(proporcion = p, entropia = entropy(p), gini = gini(p))
+head(df)
+
+ggplot(df, aes(x = proporcion, y = entropia)) + 
+  geom_line(colour = "steelblue") +
+  geom_line(aes(x = proporcion, y = gini), colour = "red") +
+  xlab("P(X)") +
+  ylab("H(X)")
+
+
+
+
 
 
