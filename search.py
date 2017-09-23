@@ -4,14 +4,12 @@ Created on Sat Sep 23 14:42:46 2017
 
 @author: alcaz
 """
-
-
 # Create the data structure for the frontier
 class queue(object):
     '''
-    Implementation of a queue list based on the built-in class list.
-    The newest elements are inserted in the first position. So the oldest
-    element is in the tail of the list.
+    Implementation of a queue list (FIFO) based on the built-in class list.
+    The newest elements are inserted in the first positions. So the oldest
+    ones are in the tail of the list.
     '''
     def __init__(self, elements):
         self.list = elements
@@ -44,13 +42,29 @@ class queue(object):
    
 
 
-class stack(object):
-    def __init__(self, list)    :
-        self.list = list
-        
-    def 
+class stack(queue):
+    '''
+    Implementation of a stack list (LIFO queue) based on queue class.
+    Rewrite the insert and pop method of the queue class (FIFO).
+    '''
+    def __init__(self, elements):
+        queue.__init__(self, elements)
     
+    def insert(self, element):
+        '''
+        Insert an element in the queue list and return the queue list.
+        '''
+        self.list = [element] + self.list
+        return self.list
     
+    def pop(self):
+        '''
+        Remove the newest element of the queue and returns it.
+        '''
+        return self.list.pop(0)
+    
+
+
     
 class node(object):
     '''
