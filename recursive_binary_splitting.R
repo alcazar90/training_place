@@ -202,7 +202,7 @@ recursive_binary_splitting(y, X, var = NULL) {
 # ==============================================================================
 # función de entropia (Claude Shannon / Teoría de la información) 
 entropy <- function(p) {
-  -p * log2(p) + ( - (1- p) * log2((1 - p)))
+  -p * log(p) + ( - (1- p) * log((1 - p)))
 }
 
 gini <- function(p) {
