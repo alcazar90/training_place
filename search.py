@@ -35,6 +35,16 @@ class queue(object):
             Otherwise, return False.
         '''
         return len(self.list) == 0
+    
+    def __iter__(self):
+        '''
+        Make the queue list an iterable object.
+        '''
+        return iter(self.list)
+    
+    def member(self, other):
+        members = set(self.list)
+        return other == members
       
     def __str__(self):
         result = ''
@@ -47,17 +57,11 @@ class queue(object):
 class stack(queue):
     '''
     Implementation of a stack list (LIFO queue) based on queue class.
-    Rewrite the insert and pop method of the queue class (FIFO).
+    Rewrite the pop method of the queue class (FIFO).
     '''
     def __init__(self, elements):
         queue.__init__(self, elements)
     
-    def insert(self, element):
-        '''
-        Insert an element in the queue list and return the queue list.
-        '''
-        self.list = [element] + self.list
-        return self.list
     
     def pop(self):
         '''
@@ -83,97 +87,85 @@ class problem(object):
         row to the last.
         Warning: This class work only with square puzzles, i.e. n x n boards.
         '''
-        self.state = puzzle
+        self.initial_state = puzzle
         self.goal = goal
         self.puzzle_length = len(puzzle)
         self.board_size = int(len(puzzle) ** 0.5)
         
-    def get_state(self):
-        '''
-        Return the tuple representation of the puzzle.
-        '''
-        return self.state[:]
         
-    def set_state(self, puzzle):
-        '''
-        Change the state values with a new puzzle configuration.
-        '''
-        self.state = puzzle
-        
-    def show_board(self):
+    def show_board(self, state):
         '''
         For visualize the board of the puzzle in a matrix way, each row in a row.
         '''
-        self.board = []
+        board = []
         for j in range(0, self.puzzle_length, self.board_size):
-            self.board.append(list(self.state[j:(j + self.board_size)]))
-        for i in range(len(self.board)):
-            print(self.board[i], sep = '\n')
+            board.append(list(state[j:(j + self.board_size)]))
+        for i in range(len(board)):
+            print(board[i], sep = '\n')
             
-    def actions(self):
+    def actions(self, state):
         '''
         Get the movements of the blank space (actions) with the following convention
         order: 'Up', 'Down', 'Left' and 'Right'. Different subsets of these are
         possible dependeding (available movements) on where the blank space is.
         
-        Return a tuple with all the available movements from the board instance
+        Return a list with all the available movements from the board instance
             blank space.
         '''
-        self.movements = ()
-        # find the blank space index
-        self.blank_space = self.state.index(0)
+        movements = []
         # define the constraint indexes for movements
-        self.up_cons = self.state[:self.board_size]
-        self.down_cons = self.state[self.puzzle_length - \
+        up_cons = state[:self.board_size]
+        down_cons = state[self.puzzle_length - \
                                         self.board_size:self.puzzle_length]
-        self.left_cons = self.state[::self.board_size]
-        self.right_cons = self.state[self.board_size - 1::self.board_size]
-        if 0 not in self.up_cons:
+        left_cons = state[::self.board_size]
+        right_cons = state[self.board_size - 1::self.board_size]
+        if 0 not in up_cons:
             # a 'Up' movement available
-            self.movements += ('Up',)
-        if 0 not in self.down_cons:
+            movements += ('Up',)
+        if 0 not in down_cons:
             # a 'Down' movement available
-            self.movements += ('Down',)
-        if 0 not in self.left_cons:
+            movements += ('Down',)
+        if 0 not in left_cons:
             # a 'Left' movement available
-            self.movements += ('Left',)
-        if 0 not in self.right_cons:
+            movements += ('Left',)
+        if 0 not in right_cons:
             # a 'Right' movement available
-            self.movements += ('Right',)
-        return self.movements
+            movements += ('Right',)
+        return movements
         
-    def result(self, movement):
+    def result(self, state, action):
         '''
         Apply a given movement to the current puzzle.
         
         Return a tuple with the configuration of a new puzzle resulting from
             applied the given movement to the current puzzle.
         '''
+        state = list(state)
         # find the blank space index
-        self.blank_space = self.state.index(0)
+        blank_space = state.index(0)
         # create a copy from the current state
-        self.new_state = list(self.get_state())
+        new_state = state[:]
         # execute the corresponding movement swap
-        if movement == 'Up':
-            self.swap_value = self.new_state[self.blank_space - self.board_size]
-            self.new_state[self.blank_space - self.board_size] = 0
-        if movement == 'Down':
-            self.swap_value = self.new_state[self.blank_space + self.board_size]
-            self.new_state[self.blank_space + self.board_size] = 0
-        if movement == 'Left':
-            self.swap_value = self.new_state[self.blank_space - 1]
-            self.new_state[self.blank_space - 1] = 0
-        if movement == 'Right':
-            self.swap_value = self.new_state[self.blank_space + 1]
-            self.new_state[self.blank_space + 1] = 0
-        self.new_state[self.blank_space] = self.swap_value
-        return tuple(self.new_state)  
+        if action == 'Up':
+            swap_value = new_state[blank_space - self.board_size]
+            new_state[blank_space - self.board_size] = 0
+        if action == 'Down':
+            swap_value = new_state[blank_space + self.board_size]
+            new_state[blank_space + self.board_size] = 0
+        if action == 'Left':
+            swap_value = new_state[blank_space - 1]
+            new_state[blank_space - 1] = 0
+        if action == 'Right':
+            swap_value = new_state[blank_space + 1]
+            new_state[blank_space + 1] = 0
+        new_state[blank_space] = swap_value
+        return tuple(new_state)  
     
     def goal_test(self, state):
         '''
         Determine whether a given state is a goal state
         '''
-        return self.state == self.goal
+        return state == self.goal
     
     def step_cost(self):
         '''
@@ -182,12 +174,6 @@ class problem(object):
         return 1
 
 
-
-x = [y for y in range(9)]
-x = problem(x)           
-x.get_state()
-x.show_board()
-x.step_cost()
 
 
 # =============================================================================
@@ -216,7 +202,7 @@ class node(object):
         '''
         Generate the child node of the current node given a valid action.
         '''
-        child_state = problem.result(action)
+        child_state = problem.result(self.state, action)
         update_cost = self.path_cost + problem.step_cost()
         child = node(child_state, parent = self, action = action, path_cost = update_cost)
         return child
@@ -225,7 +211,11 @@ class node(object):
         '''
         Return a list of the child nodes of the node.
         '''
-        return [self.child_node(problem, action) for action in problem.actions()]
+        if reverse == True:
+            available_actions = problem.actions(self.state)
+            available_actions.reverse()
+            return [self.child_node(problem, action) for action in available_actions]
+        return [self.child_node(problem, action) for action in problem.actions(self.state)]
     
     def path(self):
         '''
@@ -243,42 +233,131 @@ class node(object):
         back to the root. Using the list of nodes output of the method path.
         '''
         return [node.action for node in self.path()[1:]]
+    
+    def __eq__(self, other):
+        return isinstance(other, node) and self.state == other.state
         
         
     
-    
-        
+x = problem((0, 1, 2, 3, 4, 5, 6, 7, 8))
+nod1 = node((0, 1, 2, 3, 4, 5, 6, 7,8))        
+nod2 = node((8, 1, 2, 3, 4 ,5, 6, 7, 0))
+nod3 = node((0, 1, 2, 3, 4, 5, 6, 8, 7))
+nod1 == nod2
+f = [nod1, nod2]
+nod1 in f
+nod3 in f
 
-nodo1 = problem((7, 3, 1, 8, 2, 4, 5, 6, 0))
-nodo1.show_board()
-nodo1.actions()
-nodo1.result('Up')
+d = x.actions(nod1.state)
+d.reverse()
+d
+x.actions(nod1.state)
 
-x = node(nodo1.state)
-x.parent
-x.state
-x.depth
-x.path_cost
-x.child_node(nodo1, 'Up').state
-x.expand(nodo1)
+x = [1, 2, 3]
+[elem for elem in x.reverse]
 
-y = x.expand(nodo1)[0]
-z = y.expand(nodo1)[0]
-z.solution()
-x.state
-y.state
-z.state
+x.reverse()
+x
+x    
+# =============================================================================
+#                              Uninformed Search
+# =============================================================================
 
-    
-
-
-        
-        
-        
-    
+# create a format function for the output
+def output(node):
+    '''
+    Create the output file with the given format.
+    '''
+    pass
 
 
 
-        
-        
+# Breadth-First Search algorithm
+def bfs(problem):
+    '''
+    Breadth-first-search algorithm.
+    Return a solution, or failure
+    '''
+    import time
+    start_time = time.clock()
+    root_node = node(problem.initial_state)
+    # initialize the frontier with an empty queue list
+    frontier = queue([])
+    frontier.insert(root_node)
+    explored = set()
+    nodes_expanded = 0
+    while frontier:
+        current_node = frontier.pop()
+        explored.add(str(current_node.state))
+        if problem.goal_test(current_node.state):
+            # use the output function over the node with the solution to 
+            # obtain the following observations...
+            path = current_node.solution()
+            cost_path = current_node.path_cost
+            depth = current_node.depth
+            max_depth = frontier.list[0].depth
+            running_time = round(time.clock() - start_time, 8)
+            print('\npath_to_goal: ', path,
+                  '\ncost_of_path: ', cost_path,
+                  '\nnodes_expanded: ', nodes_expanded,
+                  '\nsearch_depth: ', depth,
+                  '\nmax_search_depth: ', max_depth,
+                  '\nrunning_time: ', running_time)
+            return True
+        nodes_expanded += 1
+        for child in current_node.expand(problem):
+            if str(child.state) not in explored and child not in frontier:
+                frontier.insert(child)
+    return False
 
+
+test = problem((1,2,5,3,4,0,6,7,8))
+bfs(test)
+
+
+def dfs(problem):
+    '''
+    Depth-First-Search algorithm.
+    Return a solution, or failure
+    '''
+    import time
+    start_time = time.clock()
+    root_node = node(problem.initial_state)
+    frontier = stack([])
+    frontier.insert(root_node)
+    explored = set()
+    nodes_expanded = 0
+    while frontier:
+        current_node = frontier.pop()
+        explored.add(str(current_node.state))
+        if problem.goal_test(current_node.state):
+            path = current_node.solution()
+            cost_path = current_node.path_cost
+            depth = current_node.depth
+            max_depth = frontier.list[0].depth
+            running_time = round(time.clock() - start_time, 8)
+            print('\npath_to_goal: ', path,
+                  '\ncost_of_path: ', cost_path,
+                  '\nnodes_expanded: ', nodes_expanded,
+                  '\nsearch_depth: ', depth,
+                  '\nmax_search_depth: ', max_depth,
+                  '\nrunning_time: ', running_time)
+            return True
+        nodes_expanded += 1
+        for child in current_node.expand(problem, reverse = True):
+            if str(child.state) not in explored and frontier.member(child):
+                frontier.insert(child)
+    return False
+
+# arreglar problemas con dfs
+# ver como checkear nuevas nodos generados en la lista de la frontera
+# en complejidad O(1)
+test = problem((1,2,5,3,4,0,6,7,8))
+dfs(test)
+
+
+x = [1, 2, 3]   
+y = stack(x)    
+z = queue(x) 
+y.pop()
+z.pop()
